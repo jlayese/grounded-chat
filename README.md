@@ -105,7 +105,9 @@ Roughly the full 5-hour box: initial scaffolding and schema (~45 min), upload/ex
 pipeline (~1 hr), retrieval + chat route + citation tool (~1 hr), frontend (~1 hr), and the rest on
 real end-to-end testing (a real Neon database, a real API key, real uploaded documents, a real
 prompt-injection test) plus debugging the tool-calling reliability issue above, rather than
-shipping untested.
+shipping untested. Additional time post-submission went into the real PDF/DOMMatrix production
+bug above, found only once a real PDF was actually deployed and tested, not caught by local
+testing alone.
 
 ## AI tools used
 
