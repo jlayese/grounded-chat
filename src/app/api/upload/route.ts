@@ -104,7 +104,15 @@ export async function POST(req: NextRequest) {
 
 // Ensures a chat row exists before a document/message references it.
 export async function PUT(req: NextRequest) {
-  const { title } = await req.json().catch(() => ({ title: undefined }));
-  const [chat] = await db.insert(chats).values({ title }).returning();
-  return NextResponse.json({ chat });
+  try {
+    const { title } = await req.json().catch(() => ({ title: undefined }));
+    const [chat] = await db.insert(chats).values({ title }).returning();
+    return NextResponse.json({ chat });
+  } catch (error) {
+    console.error("Failed to create chat:", error);
+    return NextResponse.json(
+      { error: "Failed to start a new chat session." },
+      { status: 500 }
+    );
+  }
 }
