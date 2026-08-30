@@ -1,5 +1,3 @@
-import { PDFParse } from "pdf-parse";
-
 export type ExtractedPage = {
   location: string | null;
   text: string;
@@ -15,6 +13,19 @@ export async function extractPages(
   mimeType: string
 ): Promise<ExtractedPage[]> {
   if (mimeType === "application/pdf") {
+    // pdf-parse (via pdfjs-dist) references DOMMatrix, a browser-only API,
+    // even for plain text extraction with no rendering involved. It isn't
+    // defined in the Node.js runtime Vercel/Next.js API routes run in, so
+    // polyfill it before pdf-parse loads. Also why the import is dynamic
+    // here rather than a static top-of-file import: a static import would
+    // crash this entire module, including routes that never touch PDFs,
+    // the moment Next.js loads it as an external module.
+    if (!("DOMMatrix" in globalThis)) {
+      const { default: CSSMatrix } = await import("dommatrix");
+      (globalThis as typeof globalThis & { DOMMatrix: unknown }).DOMMatrix =
+        CSSMatrix;
+    }
+    const { PDFParse } = await import("pdf-parse");
     const parser = new PDFParse({ data: buffer });
     try {
       const result = await parser.getText();
