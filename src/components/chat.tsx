@@ -48,28 +48,54 @@ export function Chat({
 
   return (
     <div className="flex h-screen flex-col">
+      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-3xl items-center gap-2.5 px-4">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+            <span className="relative inline-flex size-2 rounded-full bg-primary" />
+          </span>
+          <span className="text-sm font-semibold uppercase tracking-tight">Document Chat</span>
+        </div>
+      </header>
+
+      <div className="mx-auto w-full max-w-3xl px-4">
+        <p className="pt-3 text-xs font-semibold uppercase tracking-widest text-primary">
+          [01] Documents
+        </p>
+      </div>
       <UploadZone
         chatId={chatId}
         documents={documents}
         onUploaded={(doc) => setDocuments((prev) => [...prev, doc])}
       />
 
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messages.length === 0 && (
-          <EmptyState hasDocuments={hasDocuments} />
-        )}
+      <div className="mx-auto w-full max-w-3xl px-4 pt-4">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+          [02] Conversation
+        </p>
+      </div>
 
-        <div className="mx-auto flex max-w-2xl flex-col gap-4">
+      <div className="relative flex-1 overflow-y-auto px-4 py-4">
+        <div className="pointer-events-none absolute inset-0 grid-fill opacity-30" />
+        {messages.length === 0 && <EmptyState hasDocuments={hasDocuments} />}
+
+        <div className="relative mx-auto flex max-w-3xl flex-col gap-4">
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}
 
           {status === "submitted" && (
-            <div className="text-sm text-neutral-400">Thinking…</div>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+              </span>
+              Thinking…
+            </div>
           )}
 
           {error && (
-            <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+            <div className="border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               Something went wrong: {error.message}
             </div>
           )}
@@ -77,8 +103,8 @@ export function Chat({
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-neutral-200 p-3">
-        <div className="mx-auto flex max-w-2xl items-center gap-2">
+      <form onSubmit={handleSubmit} className="border-t bg-background px-4 py-3">
+        <div className="mx-auto flex max-w-3xl items-center gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -87,12 +113,12 @@ export function Chat({
                 ? "Ask a question about your document…"
                 : "Upload a document above to get started…"
             }
-            className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+            className="flex-1 border border-border bg-card px-3 py-2 text-sm font-sans text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/50"
           />
           <button
             type="submit"
             disabled={isBusy || !input.trim()}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm text-white disabled:opacity-40"
+            className="flex items-center gap-2 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-1 ring-primary transition-all hover:brightness-110 disabled:opacity-40"
           >
             Send
           </button>
@@ -104,7 +130,7 @@ export function Chat({
 
 function EmptyState({ hasDocuments }: { hasDocuments: boolean }) {
   return (
-    <div className="mx-auto mt-16 max-w-md text-center text-sm text-neutral-500">
+    <div className="relative mx-auto mt-16 max-w-md text-center font-sans text-sm text-muted-foreground">
       {hasDocuments
         ? "Ask a question about the document you uploaded."
         : "Upload a PDF, TXT, or Markdown file to start chatting with it."}
@@ -118,14 +144,16 @@ function MessageBubble({ message }: { message: UIMessage }) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-          isUser ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-900"
+        className={`max-w-[85%] px-4 py-2.5 font-sans text-sm ${
+          isUser
+            ? "bg-primary text-primary-foreground"
+            : "border border-border bg-card text-card-foreground"
         }`}
       >
         {message.parts.map((part, i) => {
           if (part.type === "text") {
             return (
-              <p key={i} className="whitespace-pre-wrap">
+              <p key={i} className="whitespace-pre-wrap leading-relaxed">
                 {part.text}
               </p>
             );

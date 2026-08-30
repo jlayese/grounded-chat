@@ -71,7 +71,11 @@ export default function Home() {
 
   if (state.status === "loading") {
     return (
-      <div className="flex h-screen items-center justify-center text-sm text-neutral-500">
+      <div className="flex h-screen items-center justify-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
+        <span className="relative flex size-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+          <span className="relative inline-flex size-2 rounded-full bg-primary" />
+        </span>
         Loading…
       </div>
     );
@@ -79,14 +83,14 @@ export default function Home() {
 
   if (state.status === "error") {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 text-sm text-neutral-600">
+      <div className="flex h-screen flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
         <p>{state.message}</p>
         <button
           onClick={() => {
             localStorage.removeItem(STORAGE_KEY);
             window.location.reload();
           }}
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-white"
+          className="border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
         >
           Start over
         </button>

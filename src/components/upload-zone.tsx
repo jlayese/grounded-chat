@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Upload, Loader2 } from "lucide-react";
 
 type DocumentSummary = {
   id: string;
@@ -47,17 +48,22 @@ export function UploadZone({
   }
 
   return (
-    <div className="flex flex-col gap-2 border-b border-neutral-200 p-3">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5 border-b px-4 pb-3 pt-2">
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={status === "uploading"}
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+          className="flex items-center gap-2 border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent disabled:opacity-50"
         >
+          {status === "uploading" ? (
+            <Loader2 className="size-3.5 animate-spin text-primary" />
+          ) : (
+            <Upload className="size-3.5 text-primary" />
+          )}
           {status === "uploading" ? "Uploading…" : "Upload document"}
         </button>
-        <span className="text-xs text-neutral-500">PDF, TXT, or Markdown</span>
+        <span className="font-sans text-xs text-muted-foreground">PDF, TXT, or Markdown</span>
         <input
           ref={inputRef}
           type="file"
@@ -71,7 +77,7 @@ export function UploadZone({
       </div>
 
       {status === "error" && error && (
-        <p className="text-xs text-red-600">{error}</p>
+        <p className="font-sans text-xs text-destructive">{error}</p>
       )}
 
       {documents.length > 0 && (
@@ -79,7 +85,7 @@ export function UploadZone({
           {documents.map((doc) => (
             <li
               key={doc.id}
-              className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
+              className="border border-primary/20 bg-primary/10 px-2.5 py-1 font-sans text-xs text-primary"
             >
               {doc.filename}
             </li>
