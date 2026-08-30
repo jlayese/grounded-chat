@@ -71,6 +71,23 @@ is read-only at runtime).
   constraint, and because the tool has no `execute` (so the loop never gets a result to react to),
   earlier testing showed the model calling the tool repeatedly across steps instead of stopping.
 
+## A real bug found post-deployment (and fixed)
+
+After the first Vercel deploy, PDF uploads returned a 500, and so did completely unrelated
+requests like creating a new chat. Root cause, found from Vercel's runtime logs: `pdf-parse`
+(via its `pdfjs-dist` dependency) references `DOMMatrix`, a browser-only API, at module-load
+time, even for plain text extraction with no rendering involved. `DOMMatrix` doesn't exist in
+Node.js. Because the import was static at the top of `route.ts`, that one failure crashed the
+entire module, every handler in the file, including `PUT` (create a new chat), which never
+touches PDFs at all.
+
+Fixed two ways: the `pdf-parse` import moved from static to dynamic, scoped inside the PDF
+branch specifically, so a PDF-only failure can't take down unrelated routes, and a small
+`DOMMatrix` polyfill (the `dommatrix` package) loads first so PDF parsing actually works rather
+than just failing more narrowly. Verified afterward against a real 2-page PDF end to end:
+correct extraction, correct per-page citations, and a question whose answer spanned both pages
+answered correctly from both.
+
 ## Known limitation (a real one, not glossed over)
 
 `gpt-4o-mini` sometimes hallucinates a fake tool invocation as **plain text**
